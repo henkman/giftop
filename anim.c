@@ -37,7 +37,7 @@ static void frame_from_gif(gifframe_t *frame, SavedImage *image,
 	frame->delayms = gcb.DelayTime == 0 ?
 		DELAY_TIME_UNIT_MS :
 		DELAY_TIME_UNIT_MS * gcb.DelayTime;
-	if(colormap == NULL) {
+	if(image->ImageDesc.ColorMap != NULL) {
 		colormap = image->ImageDesc.ColorMap;
 	}
 	if(gcb.TransparentColor != NO_TRANSPARENT_COLOR) {
