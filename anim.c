@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <gif_lib.h>
 #include <time.h>
+#include "dib.h"
 #include "anim.h"
 
 static long DELAY_TIME_UNIT_MS = 1000L / 100L;

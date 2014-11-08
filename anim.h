@@ -1,10 +1,6 @@
 #ifndef ANIM_H
 #define ANIM_H
 
-#include <windows.h>
-#include <gif_lib.h>
-#include "dib.h"
-
 typedef struct gifframe_t {
 	dib_t image;
 	unsigned int delayms;

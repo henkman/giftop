@@ -1,9 +1,9 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <gif_lib.h>
 #include <windows.h>
+#include <gif_lib.h>
+#include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
+#include "dib.h"
 #include "anim.h"
 
 static HWND get_desktop()
