@@ -18,7 +18,7 @@ static int running;
 
 static void sig_int(int signo)
 {
-    running = 0;
+	running = 0;
 }
 
 typedef struct flags_t {
@@ -29,22 +29,22 @@ typedef struct flags_t {
 static void parse_args(flags_t *flags, int argc, char **argv)
 {
 	int c;
-	
+
 	while((c = getopt(argc, argv, "g:x:y:")) != -1) {
-        switch (c) {
-        case 'g':
-            flags->gif = optarg;
-            break;
-        case 'x':
-            flags->x = atoi(optarg);
-            break;
-		case 'y':
-            flags->y = atoi(optarg);
-            break;
-        default:
+		switch(c) {
+		case 'g':
+			flags->gif = optarg;
 			break;
-        }
-    }
+		case 'x':
+			flags->x = atoi(optarg);
+			break;
+		case 'y':
+			flags->y = atoi(optarg);
+			break;
+		default:
+			break;
+		}
+	}
 }
 
 int main(int argc, char **argv)
@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 	int err;
 	HWND desk;
 	HDC hdc;
-	
+
 	parse_args(&flags, argc, argv);
 	if(flags.gif == NULL) {
 		fprintf(
@@ -64,7 +64,6 @@ int main(int argc, char **argv)
 		);
 		return 0;
 	}
-	
 	gif = DGifOpenFileName(flags.gif, &err);
 	if(gif == NULL) {
 		fprintf(stderr, "failed to open gif");
