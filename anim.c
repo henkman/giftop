@@ -9,15 +9,12 @@ static long DELAY_TIME_UNIT_MS = 1000L / 100L;
 static void find_graphics_control_block(GraphicsControlBlock *gcb,
 	SavedImage *image)
 {
-	int i;
-	ExtensionBlock *eb;
+	ExtensionBlock *eb, *end;
 
 	gcb->DelayTime = 0;
 	gcb->TransparentColor = NO_TRANSPARENT_COLOR;
-	for(i = 0, eb = image->ExtensionBlocks;
-		i < image->ExtensionBlockCount;
-		i++, eb++)
-	{
+	end = image->ExtensionBlocks + image->ExtensionBlockCount;
+	for(eb = image->ExtensionBlocks; eb != end;	eb++) {
 		if(eb->Function == GRAPHICS_EXT_FUNC_CODE) {
 			DGifExtensionToGCB(eb->ByteCount, eb->Bytes, gcb);
 			break;
