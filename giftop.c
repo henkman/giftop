@@ -6,7 +6,7 @@
 #include "dib.h"
 #include "anim.h"
 
-static HWND get_desktop()
+static HWND get_desktop(void)
 {
 	HWND hwnd;
 	hwnd = FindWindow("Progman", NULL);

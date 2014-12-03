@@ -1,8 +1,8 @@
-CC=gcc
+#CC=gcc
 SRCS=giftop.c anim.c dib.c
 OBJS=$(SRCS:.c=.o)
-CFLAGS=-O2 -std=c90 -Wall 
-LDFLAGS=-s -static -lgdi32 -lgif
+CFLAGS=-O2 -std=c90 -Wall
+LDFLAGS=-s -static -lgdi32 -lgif 
 ARCH=32
 NAME=giftop
 EXE=$(NAME).exe
