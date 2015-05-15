@@ -22,13 +22,13 @@ static void find_graphics_control_block(GraphicsControlBlock *gcb,
 	}
 }
 
-static void frame_from_gif(gifframe_t *frame, SavedImage *image,
+static void frame_from_gif(GifFrame *frame, SavedImage *image,
 	ColorMapObject *colormap)
 {
 	GraphicsControlBlock gcb;
 	GifColorType *color;
 	unsigned char *pd;
-	dib_t *dib;
+	Dib *dib;
 	int x, y, oi;
 
 	find_graphics_control_block(&gcb, image);
@@ -57,7 +57,7 @@ static void frame_from_gif(gifframe_t *frame, SavedImage *image,
 	}
 }
 
-void gifanim_init(gifanim_t *ga, GifFileType *gif, HDC hdc,
+void gifanim_init(GifAnim *ga, GifFileType *gif, HDC hdc,
 	unsigned int x, unsigned int y)
 {
 	int i;
@@ -67,7 +67,7 @@ void gifanim_init(gifanim_t *ga, GifFileType *gif, HDC hdc,
 	ga->x = x;
 	ga->y = y;
 	ga->count = gif->ImageCount;
-	ga->frames = malloc(sizeof(gifframe_t) * ga->count);
+	ga->frames = malloc(sizeof(GifFrame) * ga->count);
 	for(i = 0; i < ga->count; i++) {
 		frame_from_gif(
 			&(ga->frames[i]),
@@ -77,10 +77,10 @@ void gifanim_init(gifanim_t *ga, GifFileType *gif, HDC hdc,
 	}
 }
 
-void gifanim_drawnext(gifanim_t *ga)
+void gifanim_drawnext(GifAnim *ga)
 {
 	BITMAPINFO bi;
-	gifframe_t *frame;
+	GifFrame *frame;
 	struct timespec req;
 
 	frame = &(ga->frames[ga->current]);
@@ -105,7 +105,7 @@ void gifanim_drawnext(gifanim_t *ga)
 	ga->current = (ga->current + 1) % ga->count;
 }
 
-void gifanim_free(gifanim_t *ga)
+void gifanim_free(GifAnim *ga)
 {
 	int i;
 

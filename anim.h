@@ -1,16 +1,16 @@
-typedef struct gifframe_t {
-	dib_t image;
+typedef struct GifFrame {
+	Dib image;
 	unsigned int delayms;
-} gifframe_t;
+} GifFrame;
 
-typedef struct gifanim_t {
+typedef struct GifAnim {
 	HDC hdc;
 	unsigned int x, y;
 	unsigned int current, count;
-	gifframe_t *frames;
-} gifanim_t;
+	GifFrame *frames;
+} GifAnim;
 
-void gifanim_init(gifanim_t *ga, GifFileType *gif, HDC hdc,
+void gifanim_init(GifAnim *ga, GifFileType *gif, HDC hdc,
 	unsigned int x, unsigned int y);
-void gifanim_drawnext(gifanim_t *ga);
-void gifanim_free(gifanim_t *ga);
+void gifanim_drawnext(GifAnim *ga);
+void gifanim_free(GifAnim *ga);

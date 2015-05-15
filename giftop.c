@@ -21,12 +21,12 @@ static void sig_int(int signo)
 	running = 0;
 }
 
-typedef struct flags_t {
+typedef struct Flags {
 	char *gif;
 	int x, y;
-} flags_t;
+} Flags;
 
-static void parse_args(flags_t *flags, int argc, char **argv)
+static void parse_args(Flags *flags, int argc, char **argv)
 {
 	int c;
 
@@ -49,9 +49,9 @@ static void parse_args(flags_t *flags, int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-	flags_t flags = {0};
+	Flags flags = {0};
 	GifFileType *gif;
-	gifanim_t ga;
+	GifAnim ga;
 	int err;
 	HWND desk;
 	HDC hdc;

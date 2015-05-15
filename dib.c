@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "dib.h"
 
-void dib_init(dib_t *dib, unsigned int width, unsigned int height)
+void dib_init(Dib *dib, unsigned int width, unsigned int height)
 {
 	dib->width = width;
 	dib->height = height;
@@ -9,7 +9,7 @@ void dib_init(dib_t *dib, unsigned int width, unsigned int height)
 	dib->data = malloc(dib->stride * dib->height);
 }
 
-void dib_free(dib_t *dib)
+void dib_free(Dib *dib)
 {
 	free(dib->data);
 }

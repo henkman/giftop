@@ -1,8 +1,8 @@
-typedef struct dib_t {
+typedef struct Dib {
 	unsigned char *data;
 	unsigned int stride;
 	unsigned int width, height;
-} dib_t;
+} Dib;
 
-void dib_init(dib_t *dib, unsigned int width, unsigned int height);
-void dib_free(dib_t *dib);
+void dib_init(Dib *dib, unsigned int width, unsigned int height);
+void dib_free(Dib *dib);
