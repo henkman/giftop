@@ -1,5 +1,5 @@
 #CC=gcc
-SRCS=giftop.c anim.c dib.c
+SRCS=giftop.c
 OBJS=$(SRCS:.c=.o)
 CFLAGS=-O2 -std=c90 -Wall
 LDFLAGS=-s -static -lgdi32 -lgif 
