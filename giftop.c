@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 typedef struct {
-	unsigned char* data;
+	unsigned char *data;
 	unsigned stride;
 	unsigned width, height;
 } Dib;
@@ -20,33 +20,31 @@ typedef struct {
 	HDC hdc;
 	unsigned x, y;
 	unsigned current, count;
-	GifFrame* frames;
+	GifFrame *frames;
 } GifAnim;
 
 typedef struct Flags {
-	char* gif;
+	char *gif;
 	unsigned x, y;
 } Flags;
 
 static long DELAY_TIME_UNIT_MS = 1000L / 100L;
 
-static void dib_init(Dib* dib, unsigned width, unsigned height)
-{
+static void dib_init(Dib *dib, unsigned width, unsigned height) {
 	dib->width = width;
 	dib->height = height;
 	dib->stride = (dib->width * 3 + 3) & ~3;
 	dib->data = malloc(dib->stride * dib->height);
 }
 
-static void dib_free(Dib* dib) { free(dib->data); }
+static void dib_free(Dib *dib) { free(dib->data); }
 
-static void find_graphics_control_block(
-	GraphicsControlBlock* gcb, SavedImage* image)
-{
+static void find_graphics_control_block(GraphicsControlBlock *gcb,
+										SavedImage *image) {
 	gcb->DelayTime = 0;
 	gcb->TransparentColor = NO_TRANSPARENT_COLOR;
-	ExtensionBlock* end = image->ExtensionBlocks + image->ExtensionBlockCount;
-	for (ExtensionBlock* eb = image->ExtensionBlocks; eb != end; eb++) {
+	ExtensionBlock *end = image->ExtensionBlocks + image->ExtensionBlockCount;
+	for (ExtensionBlock *eb = image->ExtensionBlocks; eb != end; eb++) {
 		if (eb->Function == GRAPHICS_EXT_FUNC_CODE) {
 			DGifExtensionToGCB(eb->ByteCount, eb->Bytes, gcb);
 			break;
@@ -54,9 +52,8 @@ static void find_graphics_control_block(
 	}
 }
 
-static void frame_from_gif(
-	GifFrame* frame, SavedImage* image, ColorMapObject* colormap)
-{
+static void frame_from_gif(GifFrame *frame, SavedImage *image,
+						   ColorMapObject *colormap) {
 	GraphicsControlBlock gcb;
 	find_graphics_control_block(&gcb, image);
 	frame->delayms = gcb.DelayTime == 0 ? DELAY_TIME_UNIT_MS
@@ -65,18 +62,18 @@ static void frame_from_gif(
 		colormap = image->ImageDesc.ColorMap;
 	}
 	if (gcb.TransparentColor != NO_TRANSPARENT_COLOR) {
-		GifColorType* color = &(colormap->Colors[gcb.TransparentColor]);
+		GifColorType *color = &(colormap->Colors[gcb.TransparentColor]);
 		color->Red = 0x00;
 		color->Green = 0x00;
 		color->Blue = 0x00;
 	}
-	Dib* dib = &(frame->image);
+	Dib *dib = &(frame->image);
 	dib_init(dib, image->ImageDesc.Width, image->ImageDesc.Height);
 	int oi = 0;
 	for (int y = dib->height - 1; y >= 0; y--) {
 		for (int x = 0; x < dib->width; x++, oi++) {
-			GifColorType* color = &(colormap->Colors[image->RasterBits[oi]]);
-			unsigned char* pd = &(dib->data[y * dib->stride + x * 3]);
+			GifColorType *color = &(colormap->Colors[image->RasterBits[oi]]);
+			unsigned char *pd = &(dib->data[y * dib->stride + x * 3]);
 			*(pd + 0) = color->Blue;
 			*(pd + 1) = color->Green;
 			*(pd + 2) = color->Red;
@@ -84,9 +81,8 @@ static void frame_from_gif(
 	}
 }
 
-static void gifanim_init(
-	GifAnim* ga, GifFileType* gif, HDC hdc, unsigned x, unsigned y)
-{
+static void gifanim_init(GifAnim *ga, GifFileType *gif, HDC hdc, unsigned x,
+						 unsigned y) {
 	ga->hdc = hdc;
 	ga->current = 0;
 	ga->x = x;
@@ -94,14 +90,13 @@ static void gifanim_init(
 	ga->count = gif->ImageCount;
 	ga->frames = malloc(sizeof(GifFrame) * ga->count);
 	for (unsigned i = 0; i < ga->count; i++) {
-		frame_from_gif(
-			&(ga->frames[i]), &(gif->SavedImages[i]), gif->SColorMap);
+		frame_from_gif(&(ga->frames[i]), &(gif->SavedImages[i]),
+					   gif->SColorMap);
 	}
 }
 
-static void gifanim_drawnext(GifAnim* ga)
-{
-	GifFrame* frame = &(ga->frames[ga->current]);
+static void gifanim_drawnext(GifAnim *ga) {
+	GifFrame *frame = &(ga->frames[ga->current]);
 	BITMAPINFO bi;
 	bi.bmiHeader.biSize = sizeof(bi.bmiHeader);
 	bi.bmiHeader.biWidth = frame->image.width;
@@ -110,8 +105,8 @@ static void gifanim_drawnext(GifAnim* ga)
 	bi.bmiHeader.biBitCount = 24;
 	bi.bmiHeader.biCompression = BI_RGB;
 	SetDIBitsToDevice(ga->hdc, ga->x, ga->y, frame->image.width,
-		frame->image.height, 0, 0, 0, frame->image.height, frame->image.data,
-		&bi, DIB_RGB_COLORS);
+					  frame->image.height, 0, 0, 0, frame->image.height,
+					  frame->image.data, &bi, DIB_RGB_COLORS);
 	struct timespec req;
 	req.tv_nsec = ((long)(frame->delayms) % 1000L) * 1000000L;
 	req.tv_sec = (long)(frame->delayms) / 1000L;
@@ -119,27 +114,32 @@ static void gifanim_drawnext(GifAnim* ga)
 	ga->current = (ga->current + 1) % ga->count;
 }
 
-static void gifanim_free(GifAnim* ga)
-{
+static void gifanim_free(GifAnim *ga) {
 	for (unsigned i = 0; i < ga->count; i++) {
 		dib_free(&(ga->frames[i].image));
 	}
 	free(ga->frames);
 }
 
-static HWND get_desktop(void)
-{
-	HWND hwnd = FindWindow("Progman", NULL);
-	hwnd = FindWindowEx(hwnd, NULL, "SHELLDLL_DefView", NULL);
-	return FindWindowEx(hwnd, NULL, "SysListView32", NULL);
+static int find_desktop(HWND hwnd, LPARAM lParam) {
+	if (FindWindowEx(hwnd, NULL, "SHELLDLL_DefView", NULL)) {
+		HWND *phwnd = (HWND *)lParam;
+		*phwnd = FindWindowEx(NULL, hwnd, "WorkerW", NULL);
+	}
+	return 1;
+}
+
+static HWND get_desktop(void) {
+	HWND hwnd = 0;
+	EnumWindows(find_desktop, (LPARAM)&hwnd);
+	return hwnd;
 }
 
 static int running = 1;
 
 static void sig_int(int signo) { running = 0; }
 
-static void parse_args(Flags* flags, int argc, char** argv)
-{
+static void parse_args(Flags *flags, int argc, char **argv) {
 	int c;
 	while ((c = getopt(argc, argv, "g:x:y:")) != -1) {
 		switch (c) {
@@ -158,17 +158,16 @@ static void parse_args(Flags* flags, int argc, char** argv)
 	}
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char **argv) {
 	int err;
-	Flags flags = { 0 };
+	Flags flags = {0};
 	parse_args(&flags, argc, argv);
 	if (!flags.gif) {
-		fprintf(
-			stderr, "usage: giftop -g gif [-x x-position] [-y y-position]\n");
+		fprintf(stderr,
+				"usage: giftop -g gif [-x x-position] [-y y-position]\n");
 		return 0;
 	}
-	GifFileType* gif = DGifOpenFileName(flags.gif, &err);
+	GifFileType *gif = DGifOpenFileName(flags.gif, &err);
 	if (!gif) {
 		fprintf(stderr, "failed to open gif");
 		return 1;
